@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_maps_flutter: ^2.1.8
   url_launcher: ^6.1.4
+  file_picker: ^4.6.1
+  http: ^0.13.4
+  dio: ^4.0.6
 
 
 
