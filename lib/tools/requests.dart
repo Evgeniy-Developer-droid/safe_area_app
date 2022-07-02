@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,4 +17,23 @@ void deleteMedia(id) async {
     final url = Uri.parse("https://safe-area.com.ua/api/delete_media/" + id.toString());
     final request = http.Request("DELETE", url);
     await request.send();
+}
+
+Future<int> createEvent(lat, lng, typeOfSituation, mediaIds, description) async {
+  var url = Uri.parse("https://safe-area.com.ua/api/create_event");
+  Map data = {
+    'lat': lat,
+    'lon': lng,
+    'description': description,
+    'media_ids': mediaIds,
+    'type_of_situation': typeOfSituation
+  };
+  var body = json.encode(data);
+  var response = await http.post(url,
+      headers: {"Content-Type": "application/json"},
+      body: body
+  );
+  // print("${response.statusCode}");
+  // print("${response.body}");
+  return response.statusCode;
 }

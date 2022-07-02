@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../tools/Data.dart';
 
 class DescriptionNewEvent extends StatefulWidget {
   const DescriptionNewEvent({Key? key}) : super(key: key);
@@ -8,11 +11,15 @@ class DescriptionNewEvent extends StatefulWidget {
 }
 
 class _DescriptionNewEventState extends State<DescriptionNewEvent> {
-  String _description = "";
+  final TextEditingController _controller = new TextEditingController();
+  var _needToUpdate = true;
 
   @override
   Widget build(BuildContext context) {
-    print(_description);
+    if(_needToUpdate){
+      _controller.text = context.watch<Data>().getDescriptionNewEvent;
+      _needToUpdate = false;
+    }
     return SafeArea(
         child: Column(
           children: <Widget>[
@@ -20,10 +27,9 @@ class _DescriptionNewEventState extends State<DescriptionNewEvent> {
               keyboardType: TextInputType.multiline,
               maxLines: 6,
               minLines: 6,
+              controller: _controller,
               onChanged: (value){
-                setState((){
-                  _description = value;
-                });
+                context.read<Data>().changeDescription(value);
               },
               decoration: InputDecoration(
                   labelText: 'Describe',

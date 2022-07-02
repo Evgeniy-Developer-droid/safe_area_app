@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../tools/Data.dart';
 
 class MapNewEvent extends StatefulWidget {
   const MapNewEvent({Key? key}) : super(key: key);
@@ -14,10 +17,7 @@ class _MapNewEventState extends State<MapNewEvent> {
   Completer<GoogleMapController> _controller = Completer();
   String mapTheme = '';
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  final Set<Marker> _markers = {};
 
   @override
   void initState(){
@@ -27,17 +27,42 @@ class _MapNewEventState extends State<MapNewEvent> {
     });
   }
 
+  void _onAddMarkerButtonPressed(LatLng latlang) {
+    context.read<Data>().changeCoord(latlang.latitude, latlang.longitude);
+    setState(() {
+      _markers.add(Marker(
+        // This marker id can be anything that uniquely identifies each marker.
+        markerId: MarkerId("1234"),
+        position: latlang,
+        icon: BitmapDescriptor.defaultMarker,
+      ));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    List initialCoord = context.watch<Data>().getLatLngNewEvent;
+    CameraPosition _kGooglePlex = CameraPosition(
+      target: LatLng(initialCoord[0], initialCoord[1]),
+      zoom: 5,
+    );
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.normal,
         initialCameraPosition: _kGooglePlex,
         onMapCreated: (GoogleMapController controller) {
           controller.setMapStyle(mapTheme);
-          // controller.mapId = "e2791fb2ba5aee41";
           _controller.complete(controller);
         },
+        onTap: (latlang){
+          if(_markers.length>=1)
+          {
+            _markers.clear();
+          }
+
+          _onAddMarkerButtonPressed(latlang);
+        },
+        markers: _markers,
       ),
     );
   }

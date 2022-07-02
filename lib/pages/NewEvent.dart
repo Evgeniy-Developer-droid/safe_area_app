@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:safe_area_app/widgets/MapNewEvent.dart';
 import 'package:safe_area_app/widgets/DescriptionNewEvent.dart';
 import 'package:safe_area_app/widgets/TypeSituationNewEvent.dart';
 import 'package:safe_area_app/widgets/MediaNewEvent.dart';
+
+import '../tools/Data.dart';
+import '../widgets/SuccessPageNewEvent.dart';
 
 class NewEvent extends StatefulWidget {
   const NewEvent({Key? key}) : super(key: key);
@@ -18,6 +22,8 @@ class _NewEventState extends State<NewEvent> {
   Widget _getDescription = DescriptionNewEvent();
   Widget _getMedia = MediaNewEvent();
 
+  bool created = false;
+
   Widget getBody(){
     if(_selectedStep == 0){
       return _getMap;
@@ -25,23 +31,29 @@ class _NewEventState extends State<NewEvent> {
       return _getTypeSituation;
     }else if(_selectedStep == 2) {
       return _getMedia;
-    }else{
+    }else if(_selectedStep == 3) {
       return _getDescription;
+    } else {
+      return SuccessPageNewEvent(created: created,);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Column(
+    return Container(
+      // resizeToAvoidBottomInset: false,
+      child: Column(
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height - 200,
-            child: getBody(),
-          ),
-          _getButtons(),
-          _getPointBar()
+          if(_selectedStep < 4)...[
+            Container(
+              height: MediaQuery.of(context).size.height - 200,
+              child: getBody(),
+            ),
+            _getButtons(),
+            _getPointBar()
+          ] else ...[
+            getBody()
+          ]
         ],
       ),
     );
@@ -179,7 +191,13 @@ class _NewEventState extends State<NewEvent> {
       style:  ElevatedButton.styleFrom(
           primary: Color(0xFF9E00F1)
       ),
-      onPressed: (){},
+      onPressed: () async {
+        bool result = await context.read<Data>().createNewEvent();
+        setState((){
+          created = result;
+          _selectedStep += 1;
+        });
+      },
     );
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:safe_area_app/widgets/MapGeneral.dart';
-import 'package:safe_area_app/widgets/About.dart';
-import 'package:safe_area_app/widgets/NewEvent.dart';
+import 'package:provider/provider.dart';
+import 'package:safe_area_app/pages/HomePage.dart';
+import 'package:safe_area_app/tools/Data.dart';
+import 'package:safe_area_app/pages/About.dart';
+import 'package:safe_area_app/pages/NewEvent.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +18,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
-  Widget _mapGeneral = MapGeneral();
+  Widget _home = HomePage();
   Widget _newEvent = NewEvent();
   Widget _aboutSA = AboutView();
 
@@ -27,7 +29,7 @@ class _MyAppState extends State<MyApp> {
   }
   Widget getBody(){
     if(_selectedIndex == 0){
-      return _mapGeneral;
+      return _home;
     }else if(_selectedIndex == 1){
       return _newEvent;
     }else{
@@ -37,29 +39,32 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData.dark(),
-      home: Scaffold(
-        body: getBody(),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_location_alt),
-              label: 'Add Event',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.info),
-              label: 'About',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: const Color(0xFF00F6FF),
-          onTap: _onItemTapped,
+    return ChangeNotifierProvider<Data>(
+      create: (context) => Data(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData.dark(),
+        home: Scaffold(
+          body: getBody(),
+          bottomNavigationBar: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.add_location_alt),
+                label: 'Add Event',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.info),
+                label: 'About',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: const Color(0xFF00F6FF),
+            onTap: _onItemTapped,
+          ),
         ),
       ),
     );

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../tools/Data.dart';
 
 class TypeSituationNewEvent extends StatefulWidget {
   const TypeSituationNewEvent({Key? key}) : super(key: key);
@@ -11,8 +14,15 @@ enum SingingCharacter { murder, accident, fight, theft, shooting, other }
 class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
   SingingCharacter? _character = SingingCharacter.other;
 
+  void changeSituation(value){
+    context.read<Data>().changeTypeOfSituation(value.toString().split('.').last);
+  }
+
   @override
   Widget build(BuildContext context) {
+    String initTypeOfSituation = context.watch<Data>().getTypeOfSituationNewEvent;
+    print(initTypeOfSituation);
+    _character = SingingCharacter.values.firstWhere((e) => e.toString().split('.').last == initTypeOfSituation);
     return SafeArea(
         child: Container(
           child: Column(
@@ -46,9 +56,7 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
                 value: SingingCharacter.murder,
                 groupValue: _character,
                 onChanged: (SingingCharacter? value) {
-                  setState(() {
-                    _character = value;
-                  });
+                  changeSituation(value);
                 },
               ),
               RadioListTile<SingingCharacter>(
@@ -80,9 +88,7 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
                 value: SingingCharacter.accident,
                 groupValue: _character,
                 onChanged: (SingingCharacter? value) {
-                  setState(() {
-                    _character = value;
-                  });
+                  changeSituation(value);
                 },
               ),
               RadioListTile<SingingCharacter>(
@@ -114,9 +120,7 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
                 value: SingingCharacter.fight,
                 groupValue: _character,
                 onChanged: (SingingCharacter? value) {
-                  setState(() {
-                    _character = value;
-                  });
+                  changeSituation(value);
                 },
               ),
               RadioListTile<SingingCharacter>(
@@ -148,9 +152,7 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
                 value: SingingCharacter.theft,
                 groupValue: _character,
                 onChanged: (SingingCharacter? value) {
-                  setState(() {
-                    _character = value;
-                  });
+                  changeSituation(value);
                 },
               ),
               RadioListTile<SingingCharacter>(
@@ -182,9 +184,7 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
                 value: SingingCharacter.shooting,
                 groupValue: _character,
                 onChanged: (SingingCharacter? value) {
-                  setState(() {
-                    _character = value;
-                  });
+                  changeSituation(value);
                 },
               ),
               RadioListTile<SingingCharacter>(
@@ -216,9 +216,7 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
                 value: SingingCharacter.other,
                 groupValue: _character,
                 onChanged: (SingingCharacter? value) {
-                  setState(() {
-                    _character = value;
-                  });
+                  changeSituation(value);
                 },
               ),
             ],
