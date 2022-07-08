@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:safe_area_app/tools/requests.dart';
 
 class FilterEvent extends StatefulWidget {
   const FilterEvent({Key? key}) : super(key: key);
@@ -67,7 +68,7 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
               children: [
                 Expanded(
                     child: Container(
-                      color: Color(0xFF464646),
+                      color: Color(0xFF252525),
                       child: Column(
                         children: [
                           Container(
@@ -95,7 +96,7 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
                       child: Container(
                         width: 35,
                         height: 110,
-                        color: Color(0xFF464646),
+                        color: Color(0xFF252525),
                         alignment: Alignment.center,
                         child: AnimatedIcon(
                           icon: AnimatedIcons.search_ellipsis,

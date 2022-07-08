@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:safe_area_app/tools/requests.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
-import '../tools/Data.dart';
+import '../tools/NewEventData.dart';
 
 class MediaNewEvent extends StatefulWidget {
   const MediaNewEvent({Key? key}) : super(key: key);
@@ -30,7 +30,7 @@ class _MediaNewEventState extends State<MediaNewEvent> {
 
   void parseResponse(String value){
     final body = json.decode(value);
-    context.read<Data>().addMedia(body);
+    context.read<NewEventData>().addMedia(body);
     _needsScroll = true;
     setState((){
       uploading = false;
@@ -38,7 +38,7 @@ class _MediaNewEventState extends State<MediaNewEvent> {
   }
 
   void updateAfterDelete(int id){
-    context.read<Data>().deleteMedia(id);
+    context.read<NewEventData>().deleteMedia(id);
     _needsScroll = true;
   }
 
@@ -52,7 +52,7 @@ class _MediaNewEventState extends State<MediaNewEvent> {
     return SafeArea(
         child: Column(
           children: [
-            if(context.watch<Data>().getAllMediaNewEvent.length != 0)...[
+            if(context.watch<NewEventData>().getAllMediaNewEvent.length != 0)...[
               Container(
                 height: 150,
                 padding: EdgeInsets.all(5),
@@ -63,7 +63,7 @@ class _MediaNewEventState extends State<MediaNewEvent> {
                   scrollDirection: Axis.horizontal,
                   controller: _controller,
                   children: [
-                    for(var item in context.watch<Data>().getAllMediaNewEvent) Container(
+                    for(var item in context.watch<NewEventData>().getAllMediaNewEvent) Container(
                       height: 140,
                       width: 140,
                       margin: EdgeInsets.only(right: 5, left: 5),

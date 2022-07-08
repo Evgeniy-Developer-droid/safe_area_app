@@ -13,6 +13,18 @@ Future<String> uploadMedia(filename, typeOfMedia) async {
   return response.body;
 }
 
+Future<String> getEvents(String lat, String lng, String zoom, String start, String end) async {
+  var url = Uri.https('safe-area.com.ua', '/api/get_events', {
+    'lat': lat,
+    'lon': lng,
+    'zoom': zoom,
+    'start': start,
+    'end': end
+  });
+  var response = await http.get(url);
+  return response.body;
+}
+
 void deleteMedia(id) async {
     final url = Uri.parse("https://safe-area.com.ua/api/delete_media/" + id.toString());
     final request = http.Request("DELETE", url);

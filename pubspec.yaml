@@ -70,6 +70,12 @@ flutter:
     # To add assets to your application, add an assets section, like this:
   assets:
     - assets/dark_theme_map.json
+    - assets/blue.png
+    - assets/green.png
+    - assets/okean.png
+    - assets/red.png
+    - assets/white.png
+    - assets/yellow.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

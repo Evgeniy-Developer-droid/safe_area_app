@@ -2,13 +2,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:safe_area_app/tools/NewEventData.dart';
+
+import '../tools/GeneralData.dart';
 
 class ListEvent extends StatefulWidget {
-  final VoidCallback toggleSingleView;
   const ListEvent({
     Key? key,
-    required this.toggleSingleView
   }) : super(key: key);
 
   @override
@@ -81,9 +83,10 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
                               children: [
-                                GestureDetector(
+                                for(var item in context.watch<GeneralData>().getAllEvents)GestureDetector(
                                   onTap: (){
-                                    widget.toggleSingleView();
+                                    context.read<GeneralData>().toggleSingleView();
+                                    // widget.toggleSingleView();
                                   },
                                   child: Container(
                                     height: 100,
@@ -99,7 +102,7 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                                               margin: EdgeInsets.only(right: 5),
                                               decoration: BoxDecoration(
                                                 image: DecorationImage(
-                                                  image: NetworkImage("https://safe-area.com.ua/static/img/video-logo.webp"),
+                                                  image: NetworkImage(item['media']['file'] != null ? "https://safe-area.com.ua${item['media']['file']}" : "https://safe-area.com.ua/static/img/no-image.webp"),
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -113,7 +116,7 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                                                 Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text("Short description..."),
+                                                    Text(item['desc_short']),
                                                     Container(
                                                       height: 10,
                                                       width: 10,
@@ -135,7 +138,7 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                                                 Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text("01/01/2022 23:43"),
+                                                    Text(item['timestamp']),
                                                     Row(
                                                       children: [
                                                         Icon(
@@ -143,14 +146,14 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                                                           color: Colors.white,
                                                         ),
                                                         SizedBox(width: 5,),
-                                                        Text("1"),
+                                                        Text(item['meta']['image'].toString()),
                                                         SizedBox(width: 10,),
                                                         Icon(
                                                           Icons.videocam,
                                                           color: Colors.white,
                                                         ),
                                                         SizedBox(width: 5,),
-                                                        Text("1"),
+                                                        Text(item['meta']['video'].toString()),
                                                       ],
                                                     )
                                                   ],
@@ -173,6 +176,7 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                   alignment: Alignment(0, -0.7),
                   child: GestureDetector(
                     onTap: (){
+                      print("tap");
                       onIconPressed();
                     },
                     child: ClipPath(

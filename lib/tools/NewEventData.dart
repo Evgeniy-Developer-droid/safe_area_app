@@ -1,8 +1,10 @@
 import 'dart:ffi';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:safe_area_app/tools/requests.dart';
 import 'package:flutter/material.dart';
 
-class Data with ChangeNotifier{
+class NewEventData with ChangeNotifier{
+
   //new event
   String _descriptionNewEvent = "";
   List _media_idsNewEvent = [];

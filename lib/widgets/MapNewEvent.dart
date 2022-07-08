@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../tools/Data.dart';
+import '../tools/NewEventData.dart';
 
 class MapNewEvent extends StatefulWidget {
   const MapNewEvent({Key? key}) : super(key: key);
@@ -28,7 +28,7 @@ class _MapNewEventState extends State<MapNewEvent> {
   }
 
   void _onAddMarkerButtonPressed(LatLng latlang) {
-    context.read<Data>().changeCoord(latlang.latitude, latlang.longitude);
+    context.read<NewEventData>().changeCoord(latlang.latitude, latlang.longitude);
     setState(() {
       _markers.add(Marker(
         // This marker id can be anything that uniquely identifies each marker.
@@ -41,7 +41,7 @@ class _MapNewEventState extends State<MapNewEvent> {
 
   @override
   Widget build(BuildContext context) {
-    List initialCoord = context.watch<Data>().getLatLngNewEvent;
+    List initialCoord = context.watch<NewEventData>().getLatLngNewEvent;
     CameraPosition _kGooglePlex = CameraPosition(
       target: LatLng(initialCoord[0], initialCoord[1]),
       zoom: 5,

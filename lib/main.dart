@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:safe_area_app/pages/HomePage.dart';
-import 'package:safe_area_app/tools/Data.dart';
+import 'package:safe_area_app/tools/NewEventData.dart';
 import 'package:safe_area_app/pages/About.dart';
 import 'package:safe_area_app/pages/NewEvent.dart';
 
@@ -39,9 +39,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<Data>(
-      create: (context) => Data(),
-      child: MaterialApp(
+    return MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData.dark(),
         home: Scaffold(
@@ -66,7 +64,6 @@ class _MyAppState extends State<MyApp> {
             onTap: _onItemTapped,
           ),
         ),
-      ),
     );
   }
 }

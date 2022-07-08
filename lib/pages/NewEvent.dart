@@ -5,7 +5,7 @@ import 'package:safe_area_app/widgets/DescriptionNewEvent.dart';
 import 'package:safe_area_app/widgets/TypeSituationNewEvent.dart';
 import 'package:safe_area_app/widgets/MediaNewEvent.dart';
 
-import '../tools/Data.dart';
+import '../tools/NewEventData.dart';
 import '../widgets/SuccessPageNewEvent.dart';
 
 class NewEvent extends StatefulWidget {
@@ -40,21 +40,24 @@ class _NewEventState extends State<NewEvent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // resizeToAvoidBottomInset: false,
-      child: Column(
-        children: [
-          if(_selectedStep < 4)...[
-            Container(
-              height: MediaQuery.of(context).size.height - 200,
-              child: getBody(),
-            ),
-            _getButtons(),
-            _getPointBar()
-          ] else ...[
-            getBody()
-          ]
-        ],
+    return ChangeNotifierProvider<NewEventData>(
+        create:(context)=> NewEventData(),
+      child: Container(
+        // resizeToAvoidBottomInset: false,
+        child: Column(
+          children: [
+            if(_selectedStep < 4)...[
+              Container(
+                height: MediaQuery.of(context).size.height - 200,
+                child: getBody(),
+              ),
+              _getButtons(),
+              _getPointBar()
+            ] else ...[
+              getBody()
+            ]
+          ],
+        ),
       ),
     );
   }
@@ -192,7 +195,7 @@ class _NewEventState extends State<NewEvent> {
           primary: Color(0xFF9E00F1)
       ),
       onPressed: () async {
-        bool result = await context.read<Data>().createNewEvent();
+        bool result = await context.read<NewEventData>().createNewEvent();
         setState((){
           created = result;
           _selectedStep += 1;

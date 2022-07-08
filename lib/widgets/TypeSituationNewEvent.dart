@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../tools/Data.dart';
+import '../tools/NewEventData.dart';
 
 class TypeSituationNewEvent extends StatefulWidget {
   const TypeSituationNewEvent({Key? key}) : super(key: key);
@@ -15,12 +15,12 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
   SingingCharacter? _character = SingingCharacter.other;
 
   void changeSituation(value){
-    context.read<Data>().changeTypeOfSituation(value.toString().split('.').last);
+    context.read<NewEventData>().changeTypeOfSituation(value.toString().split('.').last);
   }
 
   @override
   Widget build(BuildContext context) {
-    String initTypeOfSituation = context.watch<Data>().getTypeOfSituationNewEvent;
+    String initTypeOfSituation = context.watch<NewEventData>().getTypeOfSituationNewEvent;
     print(initTypeOfSituation);
     _character = SingingCharacter.values.firstWhere((e) => e.toString().split('.').last == initTypeOfSituation);
     return SafeArea(
