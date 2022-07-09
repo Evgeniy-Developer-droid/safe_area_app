@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:safe_area_app/tools/requests.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import '../tools/GeneralData.dart';
 
 class MapGeneral extends StatefulWidget {
@@ -21,19 +22,19 @@ class MapGeneralState extends State<MapGeneral> {
   String mapTheme = '';
   Set<Marker> markers = Set();
   Map<String, BitmapDescriptor> markerIcons = {};
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
   void initMarkers(data){
     final Set<Marker> static_markers = Set();
     for(var item in data){
-      print(markerIcons[item['type_of_situation']]);
       static_markers.add(Marker( //add second marker
-        markerId: MarkerId(item['lat'].toString()),
-        position: LatLng(item['lat'], item['lon']), //position of marker
-        infoWindow: InfoWindow( //popup info
-          title: 'My Custom Title ',
-          snippet: 'My Custom Subtitle',
-        ),
-        icon: markerIcons[item['type_of_situation']] ?? BitmapDescriptor.defaultMarker //Icon for Marker
+          markerId: MarkerId(item['lat'].toString()),
+          position: LatLng(item['lat'], item['lon']), //position of marker
+          infoWindow: InfoWindow( //popup info
+            title: 'My Custom Title ',
+            snippet: 'My Custom Subtitle',
+          ),
+          icon: markerIcons[item['type_of_situation']] ?? BitmapDescriptor.defaultMarker //Icon for Marker
       ));
     }
     setState((){
@@ -53,32 +54,32 @@ class MapGeneralState extends State<MapGeneral> {
     DefaultAssetBundle.of(context).loadString('assets/dark_theme_map.json').then((value){
       mapTheme = value;
     });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
         'assets/red.png')
         .then((d) {
       markerIcons["murder"] = d;
     });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
         'assets/blue.png')
         .then((d) {
       markerIcons["accident"] = d;
     });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
         'assets/green.png')
         .then((d) {
       markerIcons["shooting"] = d;
     });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
         'assets/okean.png')
         .then((d) {
       markerIcons["theft"] = d;
     });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
         'assets/white.png')
         .then((d) {
       markerIcons["other"] = d;
     });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
         'assets/yellow.png')
         .then((d) {
       markerIcons["fight"] = d;
@@ -87,12 +88,21 @@ class MapGeneralState extends State<MapGeneral> {
 
   void updateEvents(){
     var coord = context.read<GeneralData>().getCoord;
-    var timeRanges = context.read<GeneralData>().getTimeRange;
-    // print("from ${coord}");
-    // print(markerIcons);
+    var timeRanges = context.read<GeneralData>().dateRange;
+    var types = context.read<GeneralData>().typeSituationChecked;
+    final String start = formatter.format(timeRanges.start);
+    final String end = formatter.format(timeRanges.end);
+    types.removeWhere((key, value) => value == false);
+    var keys = "";
+    for(var key in types.keys){
+      keys += "$key|";
+    }
+    if (keys != null && keys.length > 0) {
+      keys = keys.substring(0, keys.length - 1);
+    }
     getEvents(
         coord[0].toString(), coord[1].toString(), coord[2].toInt().toString(),
-        timeRanges[0], timeRanges[1])
+        start, end, keys)
         .then((value) {
       final data = json.decode(value);
       context.read<GeneralData>().updateEvents(data);
@@ -103,22 +113,63 @@ class MapGeneralState extends State<MapGeneral> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: GoogleMap(
-        mapType: MapType.normal,
-        markers: markers,
-        onCameraMove: (CameraPosition){
-          // print("${CameraPosition.zoom} ${CameraPosition.target.latitude} ${CameraPosition.target.longitude}");
-          context.read<GeneralData>().updateCoord(CameraPosition.target.latitude,
-              CameraPosition.target.longitude, CameraPosition.zoom);
+      body: Stack(
+        children: [
+          GoogleMap(
+            mapType: MapType.normal,
+            markers: markers,
+            onCameraMove: (CameraPosition){
+              // print("${CameraPosition.zoom} ${CameraPosition.target.latitude} ${CameraPosition.target.longitude}");
+              context.read<GeneralData>().updateCoord(CameraPosition.target.latitude,
+                  CameraPosition.target.longitude, CameraPosition.zoom);
               updateEvents();
-        },
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          controller.setMapStyle(mapTheme);
-          // controller.mapId = "e2791fb2ba5aee41";
-          _controller.complete(controller);
-        },
+            },
+            initialCameraPosition: _kGooglePlex,
+            onMapCreated: (GoogleMapController controller) {
+              controller.setMapStyle(mapTheme);
+              // controller.mapId = "e2791fb2ba5aee41";
+              _controller.complete(controller);
+            },
+          ),
+          if(context.watch<GeneralData>().updateButtonDisplay)...[
+            Positioned(
+                bottom: 30,
+                left: size.width/2 - 50,
+                child: GestureDetector(
+                  onTap: (){
+                    updateEvents();
+                    context.read<GeneralData>().toggleUpdateButtonDisplay();
+                  },
+                  child: Container(
+                    width: 100,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white70,
+                      boxShadow: [
+                        BoxShadow(color: Colors.cyanAccent, spreadRadius: 4,blurRadius: 7,
+                            offset: Offset(0, 0)),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.refresh, color: Colors.black),
+                        SizedBox(width: 10),
+                        Text("Update", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15
+                        ))
+                      ],
+                    ),
+                  ),
+                )
+            )
+          ]
+        ],
       ),
     );
   }

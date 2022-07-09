@@ -21,7 +21,6 @@ class _TypeSituationNewEventState extends State<TypeSituationNewEvent> {
   @override
   Widget build(BuildContext context) {
     String initTypeOfSituation = context.watch<NewEventData>().getTypeOfSituationNewEvent;
-    print(initTypeOfSituation);
     _character = SingingCharacter.values.firstWhere((e) => e.toString().split('.').last == initTypeOfSituation);
     return SafeArea(
         child: Container(

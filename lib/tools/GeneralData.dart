@@ -12,10 +12,46 @@ class GeneralData with ChangeNotifier{
   List get getCoord => [_lat, _lng, _zoom];
   List get getTimeRange => [_start, _end];
 
+  DateTimeRange dateRange = DateTimeRange(
+      start: DateTime(
+          DateTime.now().subtract(const Duration(days:1)).year,
+          DateTime.now().subtract(const Duration(days:1)).month,
+          DateTime.now().subtract(const Duration(days:1)).day
+      ),
+      end: DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day
+      )
+  );
+  Map<String, bool> typeSituationChecked = {
+    'murder': false,
+    'accident': false,
+    'fight': false,
+    'theft': false,
+    'shooting': false,
+    'other': false,
+  };
+
   bool SingleViewOpened = false;
+  bool updateButtonDisplay = false;
+
+  void updateTypeSituation(key, val){
+    typeSituationChecked[key] = val;
+    notifyListeners();
+  }
 
   void toggleSingleView(){
     SingleViewOpened = !SingleViewOpened;
+    notifyListeners();
+  }
+  void toggleUpdateButtonDisplay(){
+    updateButtonDisplay = !updateButtonDisplay;
+    notifyListeners();
+  }
+
+  void changeDateRange(dateRangeLocal){
+    dateRange = dateRangeLocal;
     notifyListeners();
   }
 

@@ -2,8 +2,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:safe_area_app/tools/requests.dart';
+import 'package:safe_area_app/tools/GeneralData.dart';
+import 'package:safe_area_app/tools/tools.dart';
 
 class FilterEvent extends StatefulWidget {
   const FilterEvent({Key? key}) : super(key: key);
@@ -19,6 +21,42 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
   late StreamController<bool> isSidebarOpenedStreamController;
   late Stream<bool> isSidebarOpenedStream;
   late StreamSink<bool> isSidebarOpenedSink;
+  DateTimeRange dateRange = DateTimeRange(
+      start: DateTime(
+          DateTime.now().subtract(const Duration(days:1)).year,
+          DateTime.now().subtract(const Duration(days:1)).month,
+          DateTime.now().subtract(const Duration(days:1)).day
+      ),
+      end: DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day
+      )
+  );
+  Map<String, bool> values = {
+    'murder': false,
+    'accident': false,
+    'fight': false,
+    'theft': false,
+    'shooting': false,
+    'other': false,
+  };
+  Map<String, Color> situationColor = {
+    'murder': Colors.red,
+    'accident': Colors.blueAccent,
+    'fight': Colors.amberAccent,
+    'theft': Colors.cyanAccent,
+    'shooting': Colors.green,
+    'other': Colors.white,
+  };
+  Map<String, Color> situationShadows = {
+    'murder': Colors.red.withOpacity(0.5),
+    'accident':Colors.blueAccent.withOpacity(0.5),
+    'fight': Colors.amberAccent.withOpacity(0.5),
+    'theft': Colors.cyanAccent.withOpacity(0.5),
+    'shooting': Colors.green.withOpacity(0.5),
+    'other': Colors.white.withOpacity(0.5),
+  };
 
   @override
   void initState(){
@@ -53,6 +91,8 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final start = dateRange.start;
+    final end = dateRange.end;
     return StreamBuilder<bool>(
       initialData: false,
       stream: isSidebarOpenedStream,
@@ -78,6 +118,63 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
                               children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                        child: ElevatedButton(
+                                          child: Text("${start.year}/${start.month}/${start.day}"),
+                                          onPressed: pickDateRange,
+                                        )
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                        child: ElevatedButton(
+                                          child: Text("${end.year}/${end.month}/${end.day}"),
+                                          onPressed: pickDateRange,
+                                        )
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  children: values.keys.map((String key) {
+                                    return CheckboxListTile(
+                                      title: Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          Container(
+                                            height: 10,
+                                            width: 10,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(100),
+                                              color: situationColor[key],
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: situationShadows[key] ?? Colors.white.withOpacity(0.5),
+                                                  spreadRadius: 5,
+                                                  blurRadius: 7,
+                                                  offset: const Offset(0, 0), // changes position of shadow
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width:20,
+                                          ),
+                                          Text(key.toCapitalized())
+                                        ],
+                                      ),
+                                      value: values[key],
+                                      onChanged: (bool? value) {
+                                        context.read<GeneralData>().updateTypeSituation(key, value);
+                                        context.read<GeneralData>().toggleUpdateButtonDisplay();
+                                        setState(() {
+                                          values[key] = value ?? false;
+                                        });
+                                      },
+                                    );
+                                  }).toList(),
+                                )
                               ],
                             ),
                           )
@@ -111,6 +208,20 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
             ));
       },
     );
+  }
+
+  Future pickDateRange() async {
+    DateTimeRange? newDateRange = await showDateRangePicker(
+      context: context,
+      initialDateRange: dateRange,
+      firstDate: DateTime(2022),
+      lastDate: DateTime(2100)
+    );
+
+    if(newDateRange == null) return; // pressed X
+    context.read<GeneralData>().changeDateRange(newDateRange);
+    context.read<GeneralData>().toggleUpdateButtonDisplay();
+    setState(() => dateRange = newDateRange);
   }
 }
 
