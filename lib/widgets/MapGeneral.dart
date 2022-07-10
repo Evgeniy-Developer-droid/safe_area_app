@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,7 @@ class MapGeneral extends StatefulWidget {
 
 class MapGeneralState extends State<MapGeneral> {
   Completer<GoogleMapController> _controller = Completer();
+  CustomInfoWindowController _customInfoWindowController = CustomInfoWindowController();
   String mapTheme = '';
   Set<Marker> markers = Set();
   Map<String, BitmapDescriptor> markerIcons = {};
@@ -29,11 +31,40 @@ class MapGeneralState extends State<MapGeneral> {
     for(var item in data){
       static_markers.add(Marker( //add second marker
           markerId: MarkerId(item['lat'].toString()),
-          position: LatLng(item['lat'], item['lon']), //position of marker
-          infoWindow: InfoWindow( //popup info
-            title: 'My Custom Title ',
-            snippet: 'My Custom Subtitle',
-          ),
+          position: LatLng(item['lat'], item['lon']),
+          onTap:(){
+            _customInfoWindowController.addInfoWindow!(
+              Container(
+                width: 150,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.black87
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(item['media']['file'] != null ? "https://safe-area.com.ua${item['media']['file']}" : "https://safe-area.com.ua/static/img/no-image.webp"),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    ),
+                    Text(item['desc_short']),
+                    ElevatedButton(onPressed: (){context.read<GeneralData>().toggleSingleView();},
+                        child: Icon(
+                          Icons.expand_more,
+                          color: Colors.white,
+                        ))
+                  ],
+                ),
+              ),
+              LatLng(item['lat'], item['lon'])
+            );
+          },
           icon: markerIcons[item['type_of_situation']] ?? BitmapDescriptor.defaultMarker //Icon for Marker
       ));
     }
@@ -122,16 +153,27 @@ class MapGeneralState extends State<MapGeneral> {
             markers: markers,
             onCameraMove: (CameraPosition){
               // print("${CameraPosition.zoom} ${CameraPosition.target.latitude} ${CameraPosition.target.longitude}");
+              _customInfoWindowController.onCameraMove!();
               context.read<GeneralData>().updateCoord(CameraPosition.target.latitude,
                   CameraPosition.target.longitude, CameraPosition.zoom);
               updateEvents();
             },
+            onTap: (position){
+              _customInfoWindowController.hideInfoWindow!();
+            },
             initialCameraPosition: _kGooglePlex,
             onMapCreated: (GoogleMapController controller) {
               controller.setMapStyle(mapTheme);
+                _customInfoWindowController.googleMapController = controller;
               // controller.mapId = "e2791fb2ba5aee41";
               _controller.complete(controller);
             },
+          ),
+          CustomInfoWindow(
+            height: 200,
+              width: 150,
+              offset: 35,
+              controller: _customInfoWindowController
           ),
           if(context.watch<GeneralData>().updateButtonDisplay)...[
             Positioned(

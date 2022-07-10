@@ -33,7 +33,7 @@ class GeneralData with ChangeNotifier{
     'other': false,
   };
 
-  bool SingleViewOpened = false;
+  bool SingleViewOpened = true;
   bool updateButtonDisplay = false;
 
   void updateTypeSituation(key, val){
