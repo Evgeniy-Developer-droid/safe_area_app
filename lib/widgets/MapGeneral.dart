@@ -1,7 +1,9 @@
 import 'dart:async';
-
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:safe_area_app/tools/requests.dart';
@@ -33,10 +35,12 @@ class MapGeneralState extends State<MapGeneral> {
           markerId: MarkerId(item['lat'].toString()),
           position: LatLng(item['lat'], item['lon']),
           onTap:(){
+            context.read<GeneralData>().changeViewEventId(item['id']);
             _customInfoWindowController.addInfoWindow!(
               Container(
-                width: 150,
-                height: 200,
+                width: 160,
+                height: 220,
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.black87
                 ),
@@ -54,7 +58,9 @@ class MapGeneralState extends State<MapGeneral> {
                       )
                     ),
                     Text(item['desc_short']),
-                    ElevatedButton(onPressed: (){context.read<GeneralData>().toggleSingleView();},
+                    ElevatedButton(onPressed: (){
+                      context.read<GeneralData>().toggleSingleView();
+                      },
                         child: Icon(
                           Icons.expand_more,
                           color: Colors.white,
@@ -78,42 +84,28 @@ class MapGeneralState extends State<MapGeneral> {
     zoom: 4,
   );
 
+  Future<void> initMarkersImages() async {
+    Uint8List markerIcon1 = await getBytesFromAsset('assets/red.png', 70);
+    Uint8List markerIcon2 = await getBytesFromAsset('assets/blue.png', 70);
+    Uint8List markerIcon3 = await getBytesFromAsset('assets/green.png', 70);
+    Uint8List markerIcon4 = await getBytesFromAsset('assets/white.png', 70);
+    Uint8List markerIcon5 = await getBytesFromAsset('assets/okean.png', 70);
+    Uint8List markerIcon6 = await getBytesFromAsset('assets/yellow.png', 70);
+    markerIcons["murder"] = BitmapDescriptor.fromBytes(markerIcon1);
+    markerIcons["accident"] = BitmapDescriptor.fromBytes(markerIcon2);
+    markerIcons["shooting"] = BitmapDescriptor.fromBytes(markerIcon3);
+    markerIcons["other"] = BitmapDescriptor.fromBytes(markerIcon4);
+    markerIcons["theft"] = BitmapDescriptor.fromBytes(markerIcon5);
+    markerIcons["fight"] = BitmapDescriptor.fromBytes(markerIcon6);
+  }
+
 
   @override
-  initState() {
+  initState(){
     super.initState();
+    initMarkersImages();
     DefaultAssetBundle.of(context).loadString('assets/dark_theme_map.json').then((value){
       mapTheme = value;
-    });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
-        'assets/red.png')
-        .then((d) {
-      markerIcons["murder"] = d;
-    });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
-        'assets/blue.png')
-        .then((d) {
-      markerIcons["accident"] = d;
-    });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
-        'assets/green.png')
-        .then((d) {
-      markerIcons["shooting"] = d;
-    });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
-        'assets/okean.png')
-        .then((d) {
-      markerIcons["theft"] = d;
-    });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
-        'assets/white.png')
-        .then((d) {
-      markerIcons["other"] = d;
-    });
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(24, 24)),
-        'assets/yellow.png')
-        .then((d) {
-      markerIcons["fight"] = d;
     });
   }
 
@@ -152,7 +144,6 @@ class MapGeneralState extends State<MapGeneral> {
             mapType: MapType.normal,
             markers: markers,
             onCameraMove: (CameraPosition){
-              // print("${CameraPosition.zoom} ${CameraPosition.target.latitude} ${CameraPosition.target.longitude}");
               _customInfoWindowController.onCameraMove!();
               context.read<GeneralData>().updateCoord(CameraPosition.target.latitude,
                   CameraPosition.target.longitude, CameraPosition.zoom);
@@ -165,13 +156,12 @@ class MapGeneralState extends State<MapGeneral> {
             onMapCreated: (GoogleMapController controller) {
               controller.setMapStyle(mapTheme);
                 _customInfoWindowController.googleMapController = controller;
-              // controller.mapId = "e2791fb2ba5aee41";
               _controller.complete(controller);
             },
           ),
           CustomInfoWindow(
-            height: 200,
-              width: 150,
+            height: 220,
+              width: 160,
               offset: 35,
               controller: _customInfoWindowController
           ),
@@ -214,5 +204,11 @@ class MapGeneralState extends State<MapGeneral> {
         ],
       ),
     );
+  }
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
   }
 }

@@ -24,15 +24,41 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<GeneralData>(
-        create: (context)=>GeneralData(),
-      child: Stack(
-        children: [
-          MapGeneral(),
-          ListEvent(),
-          FilterEvent(),
-          SingleView(),
-        ],
-      ),
+        create: (_)=>GeneralData(),
+        builder: (context, child){
+          return Stack(
+            children: [
+              MapGeneral(),
+              ListEvent(),
+              FilterEvent(),
+              if(context.watch<GeneralData>().SingleViewOpened)...[
+                SingleView(),
+              ],
+              if(context.watch<GeneralData>().fullScreenImage.isNotEmpty)...[
+                SafeArea(
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          context.read<GeneralData>().fullScreenImage,
+                          fit: BoxFit.cover,
+                          height: double.infinity,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                        ),
+                        Positioned(
+                          child: ElevatedButton(
+                            onPressed: (){
+                              context.read<GeneralData>().changeImgFullScreen("");
+                            },
+                            child: const Icon(Icons.close, color: Colors.white,),
+                          ),
+                        )
+                      ],
+                    ))
+              ]
+            ],
+          );
+        }
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:safe_area_app/widgets/ButtonsNewEvent.dart';
 import 'package:safe_area_app/widgets/MapNewEvent.dart';
 import 'package:safe_area_app/widgets/DescriptionNewEvent.dart';
 import 'package:safe_area_app/widgets/TypeSituationNewEvent.dart';
@@ -38,6 +39,23 @@ class _NewEventState extends State<NewEvent> {
     }
   }
 
+  void changeStep(action){
+    if(action == "inc"){
+      setState((){
+        _selectedStep += 1;
+      });
+    }else{
+      setState((){
+        _selectedStep -= 1;
+      });
+    }
+  }
+  void createdChange(val){
+    setState((){
+      created = val;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<NewEventData>(
@@ -51,7 +69,11 @@ class _NewEventState extends State<NewEvent> {
                 height: MediaQuery.of(context).size.height - 200,
                 child: getBody(),
               ),
-              _getButtons(),
+              ButtonsNewEvent(
+                step: _selectedStep,
+                changeStep: changeStep,
+                changeCreated: createdChange,
+              ),
               _getPointBar()
             ] else ...[
               getBody()
@@ -62,25 +84,25 @@ class _NewEventState extends State<NewEvent> {
     );
   }
 
-  Container _getButtons(){
-    return Container(
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          if(_selectedStep == 0)...[
-            _getNextButton()
-          ]else if(_selectedStep > 0 && _selectedStep < 3)...[
-            _getPrevButton(),
-            _getNextButton()
-          ] else ...[
-            _getPrevButton(),
-            _getCreateButton()
-          ]
-        ],
-      ),
-    );
-  }
+  // Container _getButtons(){
+  //   return Container(
+  //     padding: const EdgeInsets.only(top: 10, bottom: 10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //       children: [
+  //         if(_selectedStep == 0)...[
+  //           _getNextButton()
+  //         ]else if(_selectedStep > 0 && _selectedStep < 3)...[
+  //           _getPrevButton(),
+  //           _getNextButton()
+  //         ] else ...[
+  //           _getPrevButton(),
+  //           _getCreateButton()
+  //         ]
+  //       ],
+  //     ),
+  //   );
+  // }
   Container _getPointBar(){
     return Container(
       width: 100,
@@ -121,86 +143,6 @@ class _NewEventState extends State<NewEvent> {
           ),
         ],
       ),
-    );
-  }
-  ElevatedButton _getPrevButton(){
-    return ElevatedButton(
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        alignment: WrapAlignment.center,
-        children: [
-          Icon(
-              Icons.navigate_before,
-            color: Colors.black,
-          ),
-          SizedBox(
-            width:10,
-          ),
-          Text("Prev Step", style: TextStyle(color: Colors.black, fontSize: 17),)
-        ],
-      ),
-      style:  ElevatedButton.styleFrom(
-          primary: Color(0xFF60439B),
-      ),
-      onPressed: (){
-        setState((){
-          _selectedStep -= 1;
-        });
-      },
-    );
-  }
-  ElevatedButton _getNextButton(){
-    return ElevatedButton(
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        alignment: WrapAlignment.center,
-        children: [
-          Text("Next Step", style: TextStyle(color: Colors.black, fontSize: 17)),
-          SizedBox(
-            width:10,
-          ),
-          Icon(
-              Icons.navigate_next,
-              color: Colors.black,
-          )
-        ],
-      ),
-      style:  ElevatedButton.styleFrom(
-          primary: Color(0xFF60439B)
-      ),
-      onPressed: (){
-        setState((){
-          _selectedStep += 1;
-        });
-      },
-    );
-  }
-  ElevatedButton _getCreateButton(){
-    return ElevatedButton(
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        alignment: WrapAlignment.center,
-        children: [
-          Text("Create", style: TextStyle(color: Colors.black, fontSize: 17)),
-          SizedBox(
-            width:10,
-          ),
-          Icon(
-              Icons.add_circle_outline,
-            color: Colors.black,
-          )
-        ],
-      ),
-      style:  ElevatedButton.styleFrom(
-          primary: Color(0xFF9E00F1)
-      ),
-      onPressed: () async {
-        bool result = await context.read<NewEventData>().createNewEvent();
-        setState((){
-          created = result;
-          _selectedStep += 1;
-        });
-      },
     );
   }
 

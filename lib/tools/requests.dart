@@ -13,7 +13,15 @@ Future<String> uploadMedia(filename, typeOfMedia) async {
   return response.body;
 }
 
+Future<String> getEvent(int id) async {
+  print("getEvent");
+  var url = Uri.https('safe-area.com.ua', '/api/get_event/'+id.toString());
+  var response = await http.get(url);
+  return utf8.decode(response.bodyBytes);
+}
+
 Future<String> getEvents(String lat, String lng, String zoom, String start, String end, String keys) async {
+  print("getEvents");
   final param = {
     'lat': lat,
     'lon': lng,
@@ -26,7 +34,7 @@ Future<String> getEvents(String lat, String lng, String zoom, String start, Stri
   }
   var url = Uri.https('safe-area.com.ua', '/api/get_events', param);
   var response = await http.get(url);
-  return response.body;
+  return utf8.decode(response.bodyBytes);
 }
 
 void deleteMedia(id) async {

@@ -167,7 +167,9 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
                                       value: values[key],
                                       onChanged: (bool? value) {
                                         context.read<GeneralData>().updateTypeSituation(key, value);
-                                        context.read<GeneralData>().toggleUpdateButtonDisplay();
+                                        if(!context.read<GeneralData>().updateButtonDisplay){
+                                          context.read<GeneralData>().toggleUpdateButtonDisplay();
+                                        }
                                         setState(() {
                                           values[key] = value ?? false;
                                         });
@@ -220,7 +222,9 @@ class _FilterEventState extends State<FilterEvent> with SingleTickerProviderStat
 
     if(newDateRange == null) return; // pressed X
     context.read<GeneralData>().changeDateRange(newDateRange);
-    context.read<GeneralData>().toggleUpdateButtonDisplay();
+    if(!context.read<GeneralData>().updateButtonDisplay){
+      context.read<GeneralData>().toggleUpdateButtonDisplay();
+    }
     setState(() => dateRange = newDateRange);
   }
 }

@@ -33,8 +33,21 @@ class GeneralData with ChangeNotifier{
     'other': false,
   };
 
-  bool SingleViewOpened = true;
+  bool SingleViewOpened = false;
   bool updateButtonDisplay = false;
+  String fullScreenImage = "";
+
+  int viewEventId = 0;
+
+  void changeImgFullScreen(url){
+    fullScreenImage = url;
+    notifyListeners();
+  }
+
+  void changeViewEventId(id){
+    viewEventId = id;
+    notifyListeners();
+  }
 
   void updateTypeSituation(key, val){
     typeSituationChecked[key] = val;

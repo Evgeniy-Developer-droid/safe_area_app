@@ -24,6 +24,14 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
   late StreamController<bool> isSidebarOpenedStreamController;
   late Stream<bool> isSidebarOpenedStream;
   late StreamSink<bool> isSidebarOpenedSink;
+  Map<String, Color> situationColor = {
+    'murder': Colors.red,
+    'accident': Colors.blueAccent,
+    'fight': Colors.amberAccent,
+    'theft': Colors.cyanAccent,
+    'shooting': Colors.green,
+    'other': Colors.white,
+  };
 
   @override
   void initState(){
@@ -73,33 +81,34 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
               children: [
                 Expanded(
                     child: Container(
-                      color: Color(0xFF464646),
+                      color: const Color(0xFF464646),
                       child: Column(
                         children: [
                           Container(
                             height: screenHeight - 100,
-                            padding: EdgeInsets.only(left: 5, right: 5),
+                            padding: const EdgeInsets.only(left: 5, right: 5),
                             child: ListView(
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
                               children: [
                                 for(var item in context.watch<GeneralData>().getAllEvents)GestureDetector(
                                   onTap: (){
+                                    context.read<GeneralData>().changeViewEventId(item['id']);
                                     context.read<GeneralData>().toggleSingleView();
                                     // widget.toggleSingleView();
                                   },
                                   child: Container(
                                     height: 100,
-                                    padding: EdgeInsets.all(5),
-                                    margin: EdgeInsets.only(top: 10),
-                                    color: Color(0xFF313131),
+                                    padding: const EdgeInsets.all(5),
+                                    margin: const EdgeInsets.only(top: 10),
+                                    color: const Color(0xFF313131),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                             flex: 3,
                                             child:  Container(
-                                              margin: EdgeInsets.only(right: 5),
+                                              margin: const EdgeInsets.only(right: 5),
                                               decoration: BoxDecoration(
                                                 image: DecorationImage(
                                                   image: NetworkImage(item['media']['file'] != null ? "https://safe-area.com.ua${item['media']['file']}" : "https://safe-area.com.ua/static/img/no-image.webp"),
@@ -122,13 +131,13 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                                                       width: 10,
                                                       decoration: BoxDecoration(
                                                         borderRadius: BorderRadius.circular(100),
-                                                        color: Colors.red,
+                                                        color: situationColor[item['type_of_situation']],
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: Colors.red.withOpacity(0.5),
+                                                            color: situationColor[item['type_of_situation']]!.withOpacity(0.5),
                                                             spreadRadius: 5,
                                                             blurRadius: 7,
-                                                            offset: Offset(0, 0), // changes position of shadow
+                                                            offset: const Offset(0, 0), // changes position of shadow
                                                           ),
                                                         ],
                                                       ),
@@ -141,18 +150,20 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                                                     Text(item['timestamp']),
                                                     Row(
                                                       children: [
-                                                        Icon(
+                                                        const Icon(
                                                           Icons.camera_alt,
-                                                          color: Colors.white,
+                                                          color: Color(
+                                                              0xFF0C52EE),
                                                         ),
-                                                        SizedBox(width: 5,),
+                                                        const SizedBox(width: 5,),
                                                         Text(item['meta']['image'].toString()),
-                                                        SizedBox(width: 10,),
-                                                        Icon(
+                                                        const SizedBox(width: 10,),
+                                                        const Icon(
                                                           Icons.videocam,
-                                                          color: Colors.white,
+                                                          color: Color(
+                                                              0xFF8113B9),
                                                         ),
-                                                        SizedBox(width: 5,),
+                                                        const SizedBox(width: 5,),
                                                         Text(item['meta']['video'].toString()),
                                                       ],
                                                     )
@@ -173,10 +184,9 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                     )
                 ),
                 Align(
-                  alignment: Alignment(0, -0.7),
+                  alignment: const Alignment(0, -0.7),
                   child: GestureDetector(
                     onTap: (){
-                      print("tap");
                       onIconPressed();
                     },
                     child: ClipPath(
@@ -184,7 +194,7 @@ class _ListEventState extends State<ListEvent> with SingleTickerProviderStateMix
                       child: Container(
                         width: 35,
                         height: 110,
-                        color: Color(0xFF464646),
+                        color: const Color(0xFF464646),
                         alignment: Alignment.center,
                         child: AnimatedIcon(
                           icon: AnimatedIcons.menu_close,

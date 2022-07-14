@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ImageView extends StatefulWidget {
-  const ImageView({Key? key}) : super(key: key);
+  String url;
+  ImageView({Key? key, required this.url}) : super(key: key);
 
   @override
   State<ImageView> createState() => _ImageViewState();
@@ -17,7 +18,7 @@ class _ImageViewState extends State<ImageView> {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             image: DecorationImage(
-              image: NetworkImage("https://safe-area.com.ua/static/img/video-logo.webp"),
+              image: NetworkImage(widget.url),
               fit: BoxFit.cover,
             ),
             boxShadow: const [
